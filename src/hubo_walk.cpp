@@ -394,11 +394,15 @@ HuboWalkWidget::HuboWalkWidget(QWidget *parent)
 
     initializeBalParamTab();
     std::cerr << "Balance Parameters Tab loaded" << std::endl;
-    
+   
+    initializeLadderTab();
+    std::cerr << "Ladder Parameters Tab loaded" << std::endl;
+   
+ 
     addTab(commandTab, "Command");
     addTab(zmpParamTab, "ZMP Parameters");
     addTab(balParamTab, "Balance Parameters");
-
+    addTab(ladderTab, "Ladder Tab");
     initializeAchConnections();
 
 //    refreshManager = new HuboRefreshManager;
@@ -1488,8 +1492,202 @@ void HuboWalkWidget::initializeBalParamTab()
     balParamTab->setLayout(masterBalLayout);
 }
 
+void HuboWalkWidget::initializeLadderTab()
+{
+    QSizePolicy pbsize(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+    QHBoxLayout* ladder_profileLayoutTop = new QHBoxLayout;
+    QLabel* ladder_profileLab = new QLabel;
+    ladder_profileLab->setText("Profile:");
+    ladder_profileLayoutTop->addWidget(ladder_profileLab, 0, Qt::AlignVCenter | Qt::AlignRight);
+
+    ladder_profileSelect = new QComboBox;
+    ladder_profileLayoutTop->addWidget(profileSelect);
+    connect(ladder_profileSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(handleProfileSelect(int)));
+
+    ladder_saveProfile = new QPushButton;
+    ladder_saveProfile->setSizePolicy(pbsize);
+    ladder_saveProfile->setText("Save");
+    ladder_saveProfile->setToolTip("Save the values below into the currently selected profile");
+    ladder_profileLayoutTop->addWidget(ladder_saveProfile);
+    connect(ladder_saveProfile, SIGNAL(clicked()), this, SLOT(handleProfileSave()));
+
+    ladder_deleteProfile = new QPushButton;
+    ladder_deleteProfile->setSizePolicy(pbsize);
+    ladder_deleteProfile->setText("Delete");
+    ladder_deleteProfile->setToolTip("Remove the current profile from the list\n"
+                              "WARNING: This is permanent!");
+    ladder_profileLayoutTop->addWidget(ladder_deleteProfile);
+    connect(ladder_deleteProfile, SIGNAL(clicked()), this, SLOT(handleProfileDelete()));
+
+    QHBoxLayout* ladder_profileLayoutBottom = new QHBoxLayout;
+    ladder_saveAsProfile = new QPushButton;
+    ladder_saveAsProfile->setSizePolicy(pbsize);
+    ladder_saveAsProfile->setText("Save As...");
+    ladder_saveAsProfile->setToolTip("Save the values below as a new profile with the following name:");
+    ladder_profileLayoutBottom->addWidget(ladder_saveAsProfile);
+    connect(ladder_saveAsProfile, SIGNAL(clicked()), this, SLOT(handleProfileSaveAs()));
+ 
+    ladder_saveAsEdit = new QLineEdit;
+    ladder_saveAsEdit->setToolTip("Enter a name for a new profile");
+    ladder_profileLayoutBottom->addWidget(ladder_saveAsEdit);
+
+    QVBoxLayout* ladder_profileLayoutMaster = new QVBoxLayout;
+    ladder_profileLayoutMaster->addLayout(ladder_profileLayoutTop);
+    ladder_profileLayoutMaster->addLayout(ladder_profileLayoutBottom);
+
+    QVBoxLayout* ladder_leftColumn = new QVBoxLayout;
+
+    QVBoxLayout* ladder_rungSettingsLayout = new QVBoxLayout;
+    ladder_rungSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    QHBoxLayout* rung_widthLay = new QHBoxLayout;
+    QLabel* rung_widthLab = new QLabel;
+    rung_widthLab->setText("Rung width");
+    rung_widthLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rung_widthLab->setToolTip("Rung widht");
+    rung_widthLay->addWidget(rung_widthLab);
+
+    rung_widthBox = new QDoubleSpinBox;
+    rung_widthBox->setSizePolicy(pbsize);
+    rung_widthBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rung_widthBox->setToolTip(rung_widthLab->toolTip());
+    rung_widthBox->setDecimals(4);
+    rung_widthBox->setValue(0.038);
+    rung_widthBox->setSingleStep(0.01);
+    rung_widthBox->setMinimum(0);
+    rung_widthBox->setMaximum(10);
+    rung_widthLay->addWidget(rung_widthBox);
+    ladder_rungSettingsLayout->addLayout(rung_widthLay);
+   
+    QHBoxLayout* rung_lengthLay = new QHBoxLayout;
+    QLabel* rung_lengthLab = new QLabel;
+    rung_lengthLab->setText("rung length");
+    rung_lengthLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rung_lengthLab->setToolTip("Rung length");
+    rung_lengthLay->addWidget(rung_lengthLab);
+
+    rung_lengthBox = new QDoubleSpinBox;
+    rung_lengthBox->setSizePolicy(pbsize);
+    rung_lengthBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rung_lengthBox->setToolTip(rung_lengthLab->toolTip());
+    rung_lengthBox->setDecimals(4);
+    rung_lengthBox->setValue(0.038);
+    rung_lengthBox->setSingleStep(0.01);
+    rung_lengthBox->setMinimum(0);
+    rung_lengthBox->setMaximum(10);
+    rung_lengthLay->addWidget(rung_lengthBox);
+
+    ladder_rungSettingsLayout->addLayout(rung_lengthLay);
+    
+    QHBoxLayout* rung_heightLay = new QHBoxLayout;
+    QLabel* rung_heightLab = new QLabel;
+    rung_heightLab->setText("rung height");
+    rung_heightLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rung_heightLab->setToolTip("Rung height");
+    rung_heightLay->addWidget(rung_heightLab);
+
+    rung_heightBox = new QDoubleSpinBox;
+    rung_heightBox->setSizePolicy(pbsize);
+    rung_heightBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rung_heightBox->setToolTip(rung_heightLab->toolTip());
+    rung_heightBox->setDecimals(4);
+    rung_heightBox->setValue(0.038);
+    rung_heightBox->setSingleStep(0.01);
+    rung_heightBox->setMinimum(0);
+    rung_heightBox->setMaximum(10);
+    rung_heightLay->addWidget(rung_heightBox);
+
+    ladder_rungSettingsLayout->addLayout(rung_heightLay);
+
+    // The rail parameters
+    QVBoxLayout* ladder_railSettingsLayout = new QVBoxLayout;
+    ladder_railSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    QHBoxLayout* rail_heightLay = new QHBoxLayout;
+    QLabel* rail_heightLab = new QLabel;
+    rail_heightLab->setText("Rail height");
+    rail_heightLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rail_heightLab->setToolTip("Rail height");
+    rail_heightLay->addWidget(rail_heightLab);
+
+    rail_heightBox = new QDoubleSpinBox;
+    rail_heightBox->setSizePolicy(pbsize);
+    rail_heightBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rail_heightBox->setToolTip(rail_heightLab->toolTip());
+    rail_heightBox->setDecimals(4);
+    rail_heightBox->setValue(0.038);
+    rail_heightBox->setSingleStep(0.01);
+    rail_heightBox->setMinimum(0);
+    rail_heightBox->setMaximum(10);
+    rail_heightLay->addWidget(rail_heightBox);
+
+    ladder_railSettingsLayout->addLayout(rail_heightLay);
+
+    QHBoxLayout* rail_radiusLay = new QHBoxLayout;
+    QLabel* rail_radiusLab = new QLabel;
+    rail_radiusLab->setText("Rail radius");
+    rail_radiusLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rail_radiusLab->setToolTip("Rail radius");
+    rail_radiusLay->addWidget(rail_radiusLab);
+
+    rail_radiusBox = new QDoubleSpinBox;
+    rail_radiusBox->setSizePolicy(pbsize);
+    rail_radiusBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rail_radiusBox->setToolTip(rail_radiusLab->toolTip());
+    rail_radiusBox->setDecimals(4);
+    rail_radiusBox->setValue(0.038);
+    rail_radiusBox->setSingleStep(0.01);
+    rail_radiusBox->setMinimum(0);
+    rail_radiusBox->setMaximum(10);
+    rail_radiusLay->addWidget(rail_radiusBox);
+
+    ladder_railSettingsLayout->addLayout(rail_radiusLay);
+
+    //Number of stairs
+    QVBoxLayout* ladder_stairSettingsLayout = new QVBoxLayout;
+    ladder_stairSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    QHBoxLayout* stair_numberLay = new QHBoxLayout;
+    QLabel* stair_numberLab = new QLabel;
+    stair_numberLab->setText("Number of Stairs");
+    stair_numberLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    stair_numberLab->setToolTip("Number of Stairs");
+    stair_numberLay->addWidget(stair_numberLab);
+
+    stair_numberBox = new QDoubleSpinBox;
+    stair_numberBox->setSizePolicy(pbsize);
+    stair_numberBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    stair_numberBox->setToolTip(stair_numberLab->toolTip());
+    stair_numberBox->setDecimals(0);
+    stair_numberBox->setValue(0.038);
+    stair_numberBox->setSingleStep(1);
+    stair_numberBox->setMinimum(0);
+    stair_numberBox->setMaximum(10);
+    stair_numberLay->addWidget(stair_numberBox);
+
+    ladder_stairSettingsLayout->addLayout(stair_numberLay);
+
+    // master Layout
+    QVBoxLayout* masterLadderLayout = new QVBoxLayout;
+    masterLadderLayout->addLayout(ladder_profileLayoutTop);
+    masterLadderLayout->addLayout(ladder_rungSettingsLayout);
+    masterLadderLayout->addLayout(ladder_railSettingsLayout);
+    masterLadderLayout->addLayout(ladder_stairSettingsLayout);
 
 
+    ladderTab = new QWidget;
+    ladderTab->setLayout(masterLadderLayout);
+    
+    saveAsEdit->setText("Default");
+    handleProfileSaveAs();
+    saveAsEdit->setText("Default-Backup");
+    handleProfileSaveAs();
+    saveAsEdit->clear();
+    
+    profileSelect->setCurrentIndex(0);
+
+}
 
 
 

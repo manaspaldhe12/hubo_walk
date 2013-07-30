@@ -160,6 +160,7 @@ public:
   ach_channel_t zmpCmdChan;
   ach_channel_t balanceParamChan;
   ach_channel_t balanceCmdChan;
+  ach_channel_t ladder_plannerInitChan;
 
   void initializeAchConnections();
 //  void initializeAchStructs();
@@ -174,7 +175,6 @@ public:
   struct zmp_cmd cmd;
   struct balance_gains balParams;
   struct balance_cmd balCmd;
-  
   
   // Handling profiles TODO
   //std::vector<zmp_params> profiles;
@@ -234,9 +234,8 @@ public:
       QPushButton* saveAsProfile;
       QLineEdit* saveAsEdit;
       
-      QDoubleSpinBox* xOffsetBox;
-      QDoubleSpinBox* yOffsetBox;
-      QDoubleSpinBox* jerkPenalBox;
+
+
       double penalFactor;
       QDoubleSpinBox* lookAheadBox;
       
@@ -301,6 +300,30 @@ public:
 
       QPushButton* updateBalParams;
 
+    QWidget* ladderTab;
+ 
+      QComboBox* ladder_profileSelect;
+      QPushButton*  ladder_saveProfile;
+      QPushButton*  ladder_deleteProfile;
+      QPushButton*  ladder_saveAsProfile;
+      QLineEdit*  ladder_saveAsEdit;
+
+      QDoubleSpinBox* xOffsetBox;
+      QDoubleSpinBox* yOffsetBox;
+      QDoubleSpinBox* jerkPenalBox;
+
+      // for ladder
+      QDoubleSpinBox* rung_widthBox;
+      QDoubleSpinBox* rung_lengthBox;
+      QDoubleSpinBox* rung_heightBox;
+
+      QDoubleSpinBox* rail_heightBox;
+      QDoubleSpinBox* rail_radiusBox;
+      QDoubleSpinBox* stair_numberBox;
+
+
+
+
 
 protected:
   int ipAddrA;
@@ -357,9 +380,7 @@ private:
   void initializeCommandTab();
   void initializeZmpParamTab();
   void initializeBalParamTab();
-  
-
-
+  void initializeLadderTab();
 
 };
 

@@ -39,6 +39,32 @@
 namespace hubo_walk_space
 {
 
+void HuboWalkWidget::handleLadderSend()
+{
+    LadderPlanner current_params;
+    current_params.rung_width=rung_widthBox->value();
+    current_params.rung_length=rung_lengthBox->value();
+
+    current_params.rung_spacing=rung_heightBox->value();
+    current_params.first_rung_spacing=rung_1stheightBox->value();
+
+    current_params.rail_height=rail_heightBox->value();
+    current_params.rail_radius=rail_radiusBox->value();
+
+    current_params.inclination=stair_slopeBox->value();
+    current_params.number_of_stairs=stair_numberBox->value();
+
+    sendToLadderPlanner(current_params);
+}
+
+
+void HuboWalkWidget::sendToLadderPlanner(LadderPlanner current_params){
+    ach_status_t r = ach_put(&ladder_plannerInitChan, &current_params, sizeof(current_params));
+    if( r != ACH_OK )
+        std::cout << "Ladder Planner Ach Error: " << ach_result_to_string(r) << std::endl;
+ 
+}
+
 
 void HuboWalkWidget::handleForward()
 {

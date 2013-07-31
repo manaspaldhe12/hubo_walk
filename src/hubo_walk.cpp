@@ -37,8 +37,6 @@
 
 #include "hubo_walk.h"
 
-
-
 namespace hubo_walk_space
 {
 
@@ -1579,12 +1577,33 @@ void HuboWalkWidget::initializeLadderTab()
     rung_lengthLay->addWidget(rung_lengthBox);
 
     ladder_rungSettingsLayout->addLayout(rung_lengthLay);
-    
+ 
+    QHBoxLayout* rung_1stheightLay = new QHBoxLayout;
+    QLabel* rung_1stheightLab = new QLabel;
+    rung_1stheightLab->setText("1st rung spacing");
+    rung_1stheightLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rung_1stheightLab->setToolTip("1st Rung spacing");
+    rung_1stheightLay->addWidget(rung_1stheightLab);
+
+    rung_1stheightBox = new QDoubleSpinBox;
+    rung_1stheightBox->setSizePolicy(pbsize);
+    rung_1stheightBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rung_1stheightBox->setToolTip(rung_1stheightLab->toolTip());
+    rung_1stheightBox->setDecimals(4);
+    rung_1stheightBox->setValue(0.038);
+    rung_1stheightBox->setSingleStep(0.01);
+    rung_1stheightBox->setMinimum(0);
+    rung_1stheightBox->setMaximum(10);
+    rung_1stheightLay->addWidget(rung_1stheightBox);
+
+    ladder_rungSettingsLayout->addLayout(rung_1stheightLay);
+
+   
     QHBoxLayout* rung_heightLay = new QHBoxLayout;
     QLabel* rung_heightLab = new QLabel;
-    rung_heightLab->setText("rung height");
+    rung_heightLab->setText("rung spacing");
     rung_heightLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-    rung_heightLab->setToolTip("Rung height");
+    rung_heightLab->setToolTip("Rung spacing");
     rung_heightLay->addWidget(rung_heightLab);
 
     rung_heightBox = new QDoubleSpinBox;
@@ -1644,7 +1663,7 @@ void HuboWalkWidget::initializeLadderTab()
 
     ladder_railSettingsLayout->addLayout(rail_radiusLay);
 
-    //Number of stairs
+    //Number and angle of stairs
     QVBoxLayout* ladder_stairSettingsLayout = new QVBoxLayout;
     ladder_stairSettingsLayout->setAlignment(Qt::AlignCenter);
 
@@ -1668,12 +1687,45 @@ void HuboWalkWidget::initializeLadderTab()
 
     ladder_stairSettingsLayout->addLayout(stair_numberLay);
 
+    QHBoxLayout* stair_slopeLay = new QHBoxLayout;
+    QLabel* stair_slopeLab = new QLabel;
+    stair_slopeLab->setText("Slope(Degree) of Stairs");
+    stair_slopeLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    stair_slopeLab->setToolTip("Slope(Degree) of Stairs");
+    stair_slopeLay->addWidget(stair_slopeLab);
+
+    stair_slopeBox = new QDoubleSpinBox;
+    stair_slopeBox->setSizePolicy(pbsize);
+    stair_slopeBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    stair_slopeBox->setToolTip(stair_slopeLab->toolTip());
+    stair_slopeBox->setDecimals(0);
+    stair_slopeBox->setValue(0.038);
+    stair_slopeBox->setSingleStep(1);
+    stair_slopeBox->setMinimum(0);
+    stair_slopeBox->setMaximum(90);
+    stair_slopeLay->addWidget(stair_slopeBox);
+
+    ladder_stairSettingsLayout->addLayout(stair_slopeLay);
+
+    //Send button
+    QVBoxLayout* ladder_sendSettingsLayout = new QVBoxLayout;
+    ladder_sendSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    ladder_sendButton = new QPushButton;
+    ladder_sendButton->setText("  Plan and Run  ");
+    ladder_sendButton->setSizePolicy(pbsize);
+    ladder_sendSettingsLayout->addWidget(ladder_sendButton, 1, Qt::AlignCenter);
+    connect(ladder_sendButton, SIGNAL(clicked()), this, SLOT(handleLadderSend()));
+ 
+
     // master Layout
     QVBoxLayout* masterLadderLayout = new QVBoxLayout;
     masterLadderLayout->addLayout(ladder_profileLayoutTop);
     masterLadderLayout->addLayout(ladder_rungSettingsLayout);
     masterLadderLayout->addLayout(ladder_railSettingsLayout);
     masterLadderLayout->addLayout(ladder_stairSettingsLayout);
+    masterLadderLayout->addLayout(ladder_sendSettingsLayout);
+
 
 
     ladderTab = new QWidget;

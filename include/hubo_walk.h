@@ -74,7 +74,7 @@
 
 #include <hubo.h>
 #include <hubo-jointparams.h>
-
+#include <Ladder.h>
 //#include <hubo_motion_ros/AchNetworkWidget.h>
 #include <zmp-daemon.h>
 #include <balance-daemon.h>
@@ -315,13 +315,17 @@ public:
       // for ladder
       QDoubleSpinBox* rung_widthBox;
       QDoubleSpinBox* rung_lengthBox;
+      QDoubleSpinBox* rung_1stheightBox;
       QDoubleSpinBox* rung_heightBox;
+
 
       QDoubleSpinBox* rail_heightBox;
       QDoubleSpinBox* rail_radiusBox;
       QDoubleSpinBox* stair_numberBox;
+      QDoubleSpinBox* stair_slopeBox;
 
-
+      QPushButton* ladder_sendButton;
+ 
 
 
 
@@ -373,6 +377,11 @@ protected Q_SLOTS:
   void achdDisconnectSlot();
   
   void ipEditHandle(const QString &text);
+
+
+  //Ladder
+  void handleLadderSend();
+  void sendToLadderPlanner(LadderPlanner current_params);
 
 private:
 

@@ -485,6 +485,17 @@ void HuboWalkWidget::initializeAchConnections()
     r = ach_open(&balanceCmdChan, BALANCE_CMD_CHAN, NULL );
     if( r != ACH_OK )
         std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
+
+    achChannelBal.start("ach mk " + QString::fromLocal8Bit(LADDER_PLANNERINITCHAN)
+                        + " -1 -m 10 -n 8000 -o 666", QIODevice::ReadWrite);
+    achChannelBal.waitForFinished();
+    r = ach_open(&ladder_plannerInitChan, LADDER_PLANNERINITCHAN, NULL );
+    if( r != ACH_OK )
+        std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
+
+
+
+
 }
 
 void HuboWalkWidget::achdConnectSlot()

@@ -35,7 +35,7 @@
  */
 
 #include "hubo_walk.h"
-
+#include <balance-daemon.h>
 namespace hubo_walk_space
 {
 
@@ -160,6 +160,7 @@ void HuboWalkWidget::printNotWalkingMessage()
 
 
 #endif // HAVE_HUBOMZ
+
 
 void HuboWalkWidget::sendCommand()
 {
@@ -494,6 +495,13 @@ void HuboWalkWidget::initializeAchConnections()
         std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
 
 
+    achChannelBal.start("ach mk " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME)
+                        + " -1 -m 10 -n 8000 -o 666", QIODevice::ReadWrite);
+    achChannelBal.waitForFinished();
+    r = ach_open(&ladder_trajChan, HUBO_CHAN_LADDER_TRAJ_NAME, NULL );
+    if( r != ACH_OK )
+        std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
+
 
 
 }
@@ -527,6 +535,27 @@ void HuboWalkWidget::achdConnectSlot()
     connect(&achdBalCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
     connect(&achdBalCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 
+
+    achdBalCmd.start("achd push " + QString::number(ipAddrA)
+                                 + "." + QString::number(ipAddrB)
+                                 + "." + QString::number(ipAddrC)
+                                 + "." + QString::number(ipAddrD)
+                    + " " + QString::fromLocal8Bit(LADDER_PLANNERINITCHAN));
+    connect(&achdBalCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdBalCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+
+
+    achdBalCmd.start("achd push " + QString::number(ipAddrA)
+                                 + "." + QString::number(ipAddrB)
+                                 + "." + QString::number(ipAddrC)
+                                 + "." + QString::number(ipAddrD)
+                    + " " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME));
+    connect(&achdBalCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdBalCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+
+
+
+
     statusLabel->setText("Connected");
 }
 
@@ -535,6 +564,7 @@ void HuboWalkWidget::achdDisconnectSlot()
     achdZmp.kill();
     achdBal.kill();
     achdBalCmd.kill();
+    achdLadderCmd.kill();
     statusLabel->setText("Disconnected");
 }
 

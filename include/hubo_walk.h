@@ -74,7 +74,7 @@
 
 #include <hubo.h>
 #include <hubo-jointparams.h>
-#include <Ladder.h>
+#include <Ladderach.h>
 //#include <hubo_motion_ros/AchNetworkWidget.h>
 #ifdef HAVE_HUBOMZ
 #include <zmp-daemon.h>
@@ -154,7 +154,8 @@ public:
   QProcess achdBal;
   bool balConnected;
   QProcess achdBalCmd;
-  
+  QProcess achdLadderCmd;
+   
   // Update timer
   HuboRefreshManager* refreshManager;
   int getRefreshTime();
@@ -165,6 +166,8 @@ public:
   ach_channel_t balanceParamChan;
   ach_channel_t balanceCmdChan;
   ach_channel_t ladder_plannerInitChan;
+  ach_channel_t ladder_trajChan;
+
 
   void initializeAchConnections();
 //  void initializeAchStructs();

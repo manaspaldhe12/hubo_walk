@@ -488,7 +488,7 @@ void HuboWalkWidget::initializeAchConnections()
         std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
 
     achChannelBal.start("ach mk " + QString::fromLocal8Bit(LADDER_PLANNERINITCHAN)
-                        + " -1 -m 10 -n 8000 -o 666", QIODevice::ReadWrite);
+                        + " -1 -m 10 -n 6000 -o 666", QIODevice::ReadWrite);
     achChannelBal.waitForFinished();
     r = ach_open(&ladder_plannerInitChan, LADDER_PLANNERINITCHAN, NULL );
     if( r != ACH_OK )
@@ -496,7 +496,7 @@ void HuboWalkWidget::initializeAchConnections()
 
 
     achChannelBal.start("ach mk " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME)
-                        + " -1 -m 10 -n 8000 -o 666", QIODevice::ReadWrite);
+                        + " -1 -m 3 -n 8000000 -o 666", QIODevice::ReadWrite);
     achChannelBal.waitForFinished();
     r = ach_open(&ladder_trajChan, HUBO_CHAN_LADDER_TRAJ_NAME, NULL );
     if( r != ACH_OK )

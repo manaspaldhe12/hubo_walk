@@ -536,22 +536,22 @@ void HuboWalkWidget::achdConnectSlot()
     connect(&achdBalCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 
 
-    achdBalCmd.start("achd push " + QString::number(ipAddrA)
+    achdLadderPlanner.start("achd push " + QString::number(ipAddrA)
                                  + "." + QString::number(ipAddrB)
                                  + "." + QString::number(ipAddrC)
                                  + "." + QString::number(ipAddrD)
                     + " " + QString::fromLocal8Bit(LADDER_PLANNERINITCHAN));
-    connect(&achdBalCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
-    connect(&achdBalCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+    connect(&achdLadderPlanner, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdLadderPlanner, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 
 
-    achdBalCmd.start("achd push " + QString::number(ipAddrA)
+    achdLadderCmd.start("achd push " + QString::number(ipAddrA)
                                  + "." + QString::number(ipAddrB)
                                  + "." + QString::number(ipAddrC)
                                  + "." + QString::number(ipAddrD)
                     + " " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME));
-    connect(&achdBalCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
-    connect(&achdBalCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+    connect(&achdLadderCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdLadderCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 
 
 

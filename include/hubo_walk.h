@@ -155,7 +155,7 @@ public:
   bool balConnected;
   QProcess achdBalCmd;
   QProcess achdLadderCmd;
-   
+  QProcess achdLadderPlanner;   
   // Update timer
   HuboRefreshManager* refreshManager;
   int getRefreshTime();

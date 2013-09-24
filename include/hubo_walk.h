@@ -145,7 +145,6 @@ public:
 
   QString groupStyleSheet;
 
-
   // Handler for the nested ach daemon process
   QProcess achChannelZmp;
   QProcess achChannelBal;
@@ -153,9 +152,13 @@ public:
   bool zmpConnected;
   QProcess achdBal;
   bool balConnected;
+
   QProcess achdBalCmd;
   QProcess achdLadderCmd;
   QProcess achdLadderPlanner;   
+
+  QProcess achdCorrectionPlanner;
+  QProcess achdCorrectionCmd;
   // Update timer
   HuboRefreshManager* refreshManager;
   int getRefreshTime();
@@ -167,7 +170,8 @@ public:
   ach_channel_t balanceCmdChan;
   ach_channel_t ladder_plannerInitChan;
   ach_channel_t ladder_trajChan;
-
+  ach_channel_t correction_plannerInitChan;
+  ach_channel_t correction_trajChan;
 
   void initializeAchConnections();
 //  void initializeAchStructs();
@@ -335,9 +339,43 @@ public:
       QDoubleSpinBox* stair_numberBox;
       QDoubleSpinBox* stair_slopeBox;
 
-      QPushButton* ladder_sendButton;
- 
+      QDoubleSpinBox* rail_slopeBox;
+      QDoubleSpinBox* rail_startBox;
+      QDoubleSpinBox* rail_endBox;
 
+      QPushButton* ladder_sendButton;
+      QPushButton* ladder_runButton;
+
+
+    QWidget* correctionTab;
+ 
+      QComboBox* correction_profileSelect;
+      QPushButton*  correction_saveProfile;
+      QPushButton*  correction_deleteProfile;
+      QPushButton*  correction_saveAsProfile;
+      QLineEdit*  correction_saveAsEdit;
+
+      QDoubleSpinBox* leftHand_xBox;
+      QDoubleSpinBox* leftHand_yBox;
+      QDoubleSpinBox* leftHand_zBox;
+      QDoubleSpinBox* leftHand_rollBox;
+      QDoubleSpinBox* leftHand_pitchBox;
+      QDoubleSpinBox* leftHand_yawBox;
+
+      QDoubleSpinBox* rightHand_xBox;
+      QDoubleSpinBox* rightHand_yBox;
+      QDoubleSpinBox* rightHand_zBox;
+      QDoubleSpinBox* rightHand_rollBox;
+      QDoubleSpinBox* rightHand_pitchBox;
+      QDoubleSpinBox* rightHand_yawBox;
+
+      QDoubleSpinBox* legs_xBox;
+      QDoubleSpinBox* legs_yBox;
+      QDoubleSpinBox* legs_zBox;
+      QDoubleSpinBox* legs_yawBox;
+
+      QPushButton* correction_sendButton;
+      QPushButton* correction_runButton;
 
 
 protected:
@@ -394,7 +432,11 @@ protected Q_SLOTS:
   //Ladder
   void handleLadderSend();
   void sendToLadderPlanner(LadderPlanner current_params);
+  void handleLadderRun();
 
+  void handleCorrectionSend();
+  void handleCorrectionRun();
+  void sendToCorrectionPlanner(CorrectionParams params);
 private:
 
   ///////////////
@@ -402,6 +444,7 @@ private:
   void initializeZmpParamTab();
   void initializeBalParamTab();
   void initializeLadderTab();
+  void initializeCorrectionTab();
 
 };
 

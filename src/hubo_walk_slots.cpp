@@ -58,10 +58,133 @@ void HuboWalkWidget::handleLadderSend()
 }
 
 
+void HuboWalkWidget::handleLadderRun()
+{
+   printf("running Ladder \n");
+   ach_channel_t ladder_chan;
+   zmp_traj_t plannedTraj;
+
+   ach_channel_t balance_cmd_chan;
+   balance_cmd_t ladder_mode;
+   memset( &ladder_mode, 0, sizeof(ladder_mode) );
+   ladder_mode.cmd_request=BAL_LADDER_CLIMBING;
+   memset( &plannedTraj, 0, sizeof(plannedTraj) );
+   plannedTraj.count=20000;
+   for (int i=0; i<2000; i++){
+ 	for (int joint=0; joint<HUBO_JOINT_COUNT; joint++){
+ 		plannedTraj.traj[i].angles[joint]=0;
+ 		if (joint==LEB){
+			plannedTraj.traj[i].angles[LEB]=((float)(i))/2000;
+		}
+	}
+   }
+
+
+   ach_status_t r = ach_open(&balance_cmd_chan, BALANCE_CMD_CHAN, NULL );
+   if( r != ACH_OK )
+      fprintf( stderr, "Problem with channel %s: %s (%d)\n",
+              BALANCE_CMD_CHAN, ach_result_to_string(r), (int)r );
+   std::cout << "balance cmd ach_open result: " << ach_result_to_string(r) << "\n";
+
+   r = ach_put(&balance_cmd_chan, &ladder_mode, sizeof(ladder_mode));
+   std::cout << "balance cmd ach_put result: " << ach_result_to_string(r) << "\n";
+  
+   r = ach_open(&ladder_chan, HUBO_CHAN_LADDER_TRAJ_NAME, NULL );
+   if( r != ACH_OK )
+      fprintf( stderr, "Problem with channel %s: %s (%d)\n",
+              HUBO_CHAN_LADDER_TRAJ_NAME, ach_result_to_string(r), (int)r );
+   std::cout << "cm ach_open result: " << ach_result_to_string(r) << "\n";
+
+   r = ach_put(&ladder_chan, &plannedTraj, sizeof(plannedTraj));
+   std::cout << "cm ach_put result: " << ach_result_to_string(r) << "\n";
+
+
+}
+
+void HuboWalkWidget::handleCorrectionSend()
+{
+     CorrectionParams params;
+     params.left_hand_x=leftHand_xBox->value();
+     params.left_hand_y=leftHand_yBox->value();
+     params.left_hand_z=leftHand_zBox->value();
+     params.left_hand_roll=leftHand_rollBox->value();
+     params.left_hand_pitch=leftHand_pitchBox->value();
+     params.left_hand_yaw=leftHand_yawBox->value();
+
+     params.right_hand_x=rightHand_xBox->value();
+     params.right_hand_y=rightHand_yBox->value();
+     params.right_hand_z=rightHand_zBox->value();
+     params.right_hand_roll=rightHand_rollBox->value();
+     params.right_hand_pitch=rightHand_pitchBox->value();
+     params.right_hand_yaw=rightHand_yawBox->value();
+
+     params.legs_x=legs_xBox->value();
+     params.legs_y=legs_yBox->value();
+     params.legs_z=legs_zBox->value();
+     params.legs_yaw=legs_yawBox->value();
+
+    sendToCorrectionPlanner(params);
+}
+
+
+void HuboWalkWidget::handleCorrectionRun()
+{
+   printf("running correction\n");
+   
+   ach_channel_t correction_chan;
+   zmp_traj_t plannedTraj;
+
+   ach_channel_t balance_cmd_chan;
+   balance_cmd_t ladder_mode;
+   memset( &ladder_mode, 0, sizeof(ladder_mode) );
+   ladder_mode.cmd_request=BAL_LADDER_CLIMBING;
+   memset( &plannedTraj, 0, sizeof(plannedTraj) );
+   plannedTraj.count=20000;
+   for (int i=0; i<2000; i++){
+ 	for (int joint=0; joint<HUBO_JOINT_COUNT; joint++){
+ 		plannedTraj.traj[i].angles[joint]=0;
+ 		if (joint==LEB){
+			plannedTraj.traj[i].angles[LEB]=((float)(i))/2000;
+		}
+	}
+   }
+
+ 
+   ach_status_t r = ach_open(&balance_cmd_chan, BALANCE_CMD_CHAN, NULL );
+   if( r != ACH_OK )
+      fprintf( stderr, "Problem with channel %s: %s (%d)\n",
+              BALANCE_CMD_CHAN, ach_result_to_string(r), (int)r );
+   std::cout << "balance cmd ach_open result: " << ach_result_to_string(r) << "\n";
+
+   r = ach_put(&balance_cmd_chan, &ladder_mode, sizeof(ladder_mode));
+   std::cout << "balance cmd ach_put result: " << ach_result_to_string(r) << "\n";
+  
+   r = ach_open(&correction_chan, HUBO_CHAN_CORRECTION_TRAJ_NAME, NULL );
+   if( r != ACH_OK )
+      fprintf( stderr, "Problem with channel %s: %s (%d)\n",
+              HUBO_CHAN_CORRECTION_TRAJ_NAME, ach_result_to_string(r), (int)r );
+   std::cout << "correction traj ach_open result: " << ach_result_to_string(r) << "\n";
+
+   r = ach_put(&correction_chan, &plannedTraj, sizeof(plannedTraj));
+   std::cout << "correction traj ach_put result: " << ach_result_to_string(r) << "\n";
+
+
+
+}
+
+
 void HuboWalkWidget::sendToLadderPlanner(LadderPlanner current_params){
     ach_status_t r = ach_put(&ladder_plannerInitChan, &current_params, sizeof(current_params));
     if( r != ACH_OK )
         std::cout << "Ladder Planner Ach Error: " << ach_result_to_string(r) << std::endl;
+ 
+}
+
+
+void HuboWalkWidget::sendToCorrectionPlanner(CorrectionParams params){
+    ach_status_t r = ach_put(&correction_plannerInitChan, &params, sizeof(params));
+    if( r != ACH_OK )
+        std::cout << "Correction Planner Ach Error: " << ach_result_to_string(r) << std::endl;
  
 }
 
@@ -503,6 +626,19 @@ void HuboWalkWidget::initializeAchConnections()
         std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
 
 
+    achChannelBal.start("ach mk " + QString::fromLocal8Bit(CORRECTION_PLANNERINITCHAN)
+                        + " -1 -m 10 -n 6000 -o 666", QIODevice::ReadWrite);
+    achChannelBal.waitForFinished();
+    r = ach_open(&correction_plannerInitChan, CORRECTION_PLANNERINITCHAN, NULL );
+    if( r != ACH_OK )
+        std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
+
+    achChannelBal.start("ach mk " + QString::fromLocal8Bit(HUBO_CHAN_CORRECTION_TRAJ_NAME)
+                        + " -1 -m 3 -n 8000000 -o 666", QIODevice::ReadWrite);
+    achChannelBal.waitForFinished();
+    r = ach_open(&correction_trajChan, HUBO_CHAN_LADDER_TRAJ_NAME, NULL );
+    if( r != ACH_OK )
+        std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
 
 }
 
@@ -552,6 +688,25 @@ void HuboWalkWidget::achdConnectSlot()
                     + " " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME));
     connect(&achdLadderCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
     connect(&achdLadderCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+
+
+    achdCorrectionPlanner.start("achd push " + QString::number(ipAddrA)
+                                 + "." + QString::number(ipAddrB)
+                                 + "." + QString::number(ipAddrC)
+                                 + "." + QString::number(ipAddrD)
+                    + " " + QString::fromLocal8Bit(LADDER_PLANNERINITCHAN));
+    connect(&achdCorrectionPlanner, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdCorrectionPlanner, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+
+
+    achdCorrectionCmd.start("achd push " + QString::number(ipAddrA)
+                                 + "." + QString::number(ipAddrB)
+                                 + "." + QString::number(ipAddrC)
+                                 + "." + QString::number(ipAddrD)
+                    + " " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME));
+    connect(&achdCorrectionCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdCorrectionCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+
 
 
 

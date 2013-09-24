@@ -406,11 +406,14 @@ HuboWalkWidget::HuboWalkWidget(QWidget *parent)
     initializeLadderTab();
     std::cerr << "Ladder Parameters Tab loaded" << std::endl;
    
+    initializeCorrectionTab();
+    std::cerr << "Correction Tab loaded" << std::endl;
  
     addTab(commandTab, "Command");
     addTab(zmpParamTab, "ZMP Parameters");
     addTab(balParamTab, "Balance Parameters");
     addTab(ladderTab, "Ladder Tab");
+    addTab(correctionTab, "Correction Tab");
     initializeAchConnections();
 
 //    refreshManager = new HuboRefreshManager;
@@ -1717,15 +1720,88 @@ void HuboWalkWidget::initializeLadderTab()
 
     ladder_stairSettingsLayout->addLayout(stair_slopeLay);
 
-    //Send button
+ 
+    QHBoxLayout* rail_slopeLay = new QHBoxLayout;
+    QLabel* rail_slopeLab = new QLabel;
+    rail_slopeLab->setText("Slope(Degree) of Rails");
+    rail_slopeLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rail_slopeLab->setToolTip("Slope(Degree) of Rails");
+    rail_slopeLay->addWidget(rail_slopeLab);
+
+    rail_slopeBox = new QDoubleSpinBox;
+    rail_slopeBox->setSizePolicy(pbsize);
+    rail_slopeBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rail_slopeBox->setToolTip(stair_slopeLab->toolTip());
+    rail_slopeBox->setDecimals(0);
+    rail_slopeBox->setValue(0.038);
+    rail_slopeBox->setSingleStep(1);
+    rail_slopeBox->setMinimum(0);
+    rail_slopeBox->setMaximum(90);
+    rail_slopeLay->addWidget(rail_slopeBox);
+
+    ladder_stairSettingsLayout->addLayout(rail_slopeLay);
+
+
+    QHBoxLayout* rail_startLay = new QHBoxLayout;
+    QLabel* rail_startLab = new QLabel;
+    rail_startLab->setText("Start of the rail");
+    rail_startLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rail_startLab->setToolTip("Start of the rail");
+    rail_startLay->addWidget(rail_startLab);
+
+    rail_startBox = new QDoubleSpinBox;
+    rail_startBox->setSizePolicy(pbsize);
+    rail_startBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rail_startBox->setToolTip(rail_startLab->toolTip());
+    rail_startBox->setDecimals(4);
+    rail_startBox->setValue(0.038);
+    rail_startBox->setSingleStep(1);
+    rail_startBox->setMinimum(0);
+    rail_startBox->setMaximum(90);
+    rail_startLay->addWidget(rail_startBox);
+
+    ladder_stairSettingsLayout->addLayout(rail_startLay);
+
+    QHBoxLayout* rail_endLay = new QHBoxLayout;
+    QLabel* rail_endLab = new QLabel;
+    rail_endLab->setText("Start of the rail");
+    rail_endLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rail_endLab->setToolTip("Start of the rail");
+    rail_endLay->addWidget(rail_endLab);
+
+    rail_endBox = new QDoubleSpinBox;
+    rail_endBox->setSizePolicy(pbsize);
+    rail_endBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rail_endBox->setToolTip(rail_endLab->toolTip());
+    rail_endBox->setDecimals(4);
+    rail_endBox->setValue(0.038);
+    rail_endBox->setSingleStep(1);
+    rail_endBox->setMinimum(0);
+    rail_endBox->setMaximum(90);
+    rail_endLay->addWidget(rail_endBox);
+
+    ladder_stairSettingsLayout->addLayout(rail_endLay);
+
+   //Plan button
     QVBoxLayout* ladder_sendSettingsLayout = new QVBoxLayout;
     ladder_sendSettingsLayout->setAlignment(Qt::AlignCenter);
 
     ladder_sendButton = new QPushButton;
-    ladder_sendButton->setText("  Plan and Run  ");
+    ladder_sendButton->setText("  Plan motion ");
     ladder_sendButton->setSizePolicy(pbsize);
     ladder_sendSettingsLayout->addWidget(ladder_sendButton, 1, Qt::AlignCenter);
     connect(ladder_sendButton, SIGNAL(clicked()), this, SLOT(handleLadderSend()));
+ 
+
+   //Run button
+    QVBoxLayout* ladder_runSettingsLayout = new QVBoxLayout;
+    ladder_runSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    ladder_runButton = new QPushButton;
+    ladder_runButton->setText(" Run motion ");
+    ladder_runButton->setSizePolicy(pbsize);
+    ladder_runSettingsLayout->addWidget(ladder_runButton, 1, Qt::AlignCenter);
+    connect(ladder_runButton, SIGNAL(clicked()), this, SLOT(handleLadderRun()));
  
 
     // master Layout
@@ -1735,11 +1811,411 @@ void HuboWalkWidget::initializeLadderTab()
     masterLadderLayout->addLayout(ladder_railSettingsLayout);
     masterLadderLayout->addLayout(ladder_stairSettingsLayout);
     masterLadderLayout->addLayout(ladder_sendSettingsLayout);
-
+    masterLadderLayout->addLayout(ladder_runSettingsLayout);
 
 
     ladderTab = new QWidget;
     ladderTab->setLayout(masterLadderLayout);
+    
+    saveAsEdit->setText("Default");
+    handleProfileSaveAs();
+    saveAsEdit->setText("Default-Backup");
+    handleProfileSaveAs();
+    saveAsEdit->clear();
+    
+    profileSelect->setCurrentIndex(0);
+
+}
+
+void HuboWalkWidget::initializeCorrectionTab()
+{
+    QSizePolicy pbsize(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+    QHBoxLayout* correction_profileLayoutTop = new QHBoxLayout;
+    QLabel* correction_profileLab = new QLabel;
+    correction_profileLab->setText("Profile:");
+    correction_profileLayoutTop->addWidget(correction_profileLab, 0, Qt::AlignVCenter | Qt::AlignRight);
+
+    correction_profileSelect = new QComboBox;
+    correction_profileLayoutTop->addWidget(profileSelect);
+    connect(correction_profileSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(handleProfileSelect(int)));
+
+    correction_saveProfile = new QPushButton;
+    correction_saveProfile->setSizePolicy(pbsize);
+    correction_saveProfile->setText("Save");
+    correction_saveProfile->setToolTip("Save the values below into the currently selected profile");
+    correction_profileLayoutTop->addWidget(correction_saveProfile);
+    connect(correction_saveProfile, SIGNAL(clicked()), this, SLOT(handleProfileSave()));
+
+    correction_deleteProfile = new QPushButton;
+    correction_deleteProfile->setSizePolicy(pbsize);
+    correction_deleteProfile->setText("Delete");
+    correction_deleteProfile->setToolTip("Remove the current profile from the list\n"
+                              "WARNING: This is permanent!");
+    correction_profileLayoutTop->addWidget(correction_deleteProfile);
+    connect(correction_deleteProfile, SIGNAL(clicked()), this, SLOT(handleProfileDelete()));
+
+    QHBoxLayout* correction_profileLayoutBottom = new QHBoxLayout;
+    correction_saveAsProfile = new QPushButton;
+    correction_saveAsProfile->setSizePolicy(pbsize);
+    correction_saveAsProfile->setText("Save As...");
+    correction_saveAsProfile->setToolTip("Save the values below as a new profile with the following name:");
+    correction_profileLayoutBottom->addWidget(correction_saveAsProfile);
+    connect(correction_saveAsProfile, SIGNAL(clicked()), this, SLOT(handleProfileSaveAs()));
+ 
+    correction_saveAsEdit = new QLineEdit;
+    correction_saveAsEdit->setToolTip("Enter a name for a new profile");
+    correction_profileLayoutBottom->addWidget(correction_saveAsEdit);
+
+    QVBoxLayout* correction_profileLayoutMaster = new QVBoxLayout;
+    correction_profileLayoutMaster->addLayout(correction_profileLayoutTop);
+    correction_profileLayoutMaster->addLayout(correction_profileLayoutBottom);
+
+    QVBoxLayout* correction_leftColumn = new QVBoxLayout;
+
+    QVBoxLayout* correction_SettingsLayout = new QVBoxLayout;
+    correction_SettingsLayout->setAlignment(Qt::AlignCenter);
+
+    //LEFT HAND
+    QHBoxLayout* leftHand_xLay = new QHBoxLayout;
+    QLabel* leftHand_xLab = new QLabel;
+    leftHand_xLab->setText("left_hand x");
+    leftHand_xLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    leftHand_xLab->setToolTip("left_hand x");
+    leftHand_xLay->addWidget(leftHand_xLab);
+
+    leftHand_xBox = new QDoubleSpinBox;
+    leftHand_xBox->setSizePolicy(pbsize);
+    leftHand_xBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    leftHand_xBox->setToolTip(leftHand_xLab->toolTip());
+    leftHand_xBox->setDecimals(4);
+    leftHand_xBox->setValue(0.038);
+    leftHand_xBox->setSingleStep(0.01);
+    leftHand_xBox->setMinimum(0);
+    leftHand_xBox->setMaximum(10);
+    leftHand_xLay->addWidget(leftHand_xBox);
+    correction_SettingsLayout->addLayout(leftHand_xLay);
+    
+    QHBoxLayout* leftHand_yLay = new QHBoxLayout;
+    QLabel* leftHand_yLab = new QLabel;
+    leftHand_yLab->setText("left_hand y");
+    leftHand_yLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    leftHand_yLab->setToolTip("left_hand y");
+    leftHand_yLay->addWidget(leftHand_yLab);
+
+    leftHand_yBox = new QDoubleSpinBox;
+    leftHand_yBox->setSizePolicy(pbsize);
+    leftHand_yBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    leftHand_yBox->setToolTip(leftHand_yLab->toolTip());
+    leftHand_yBox->setDecimals(4);
+    leftHand_yBox->setValue(0.038);
+    leftHand_yBox->setSingleStep(0.01);
+    leftHand_yBox->setMinimum(0);
+    leftHand_yBox->setMaximum(10);
+    leftHand_yLay->addWidget(leftHand_yBox);
+    correction_SettingsLayout->addLayout(leftHand_yLay);
+
+    QHBoxLayout* leftHand_zLay = new QHBoxLayout;
+    QLabel* leftHand_zLab = new QLabel;
+    leftHand_zLab->setText("left_hand z");
+    leftHand_zLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    leftHand_zLab->setToolTip("left_hand z");
+    leftHand_zLay->addWidget(leftHand_zLab);
+
+    leftHand_zBox = new QDoubleSpinBox;
+    leftHand_zBox->setSizePolicy(pbsize);
+    leftHand_zBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    leftHand_zBox->setToolTip(leftHand_zLab->toolTip());
+    leftHand_zBox->setDecimals(4);
+    leftHand_zBox->setValue(0.038);
+    leftHand_zBox->setSingleStep(0.01);
+    leftHand_zBox->setMinimum(0);
+    leftHand_zBox->setMaximum(10);
+    leftHand_zLay->addWidget(leftHand_zBox);
+    correction_SettingsLayout->addLayout(leftHand_zLay);
+
+    QHBoxLayout* leftHand_rollLay = new QHBoxLayout;
+    QLabel* leftHand_rollLab = new QLabel;
+    leftHand_rollLab->setText("left_hand roll");
+    leftHand_rollLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    leftHand_rollLab->setToolTip("left_hand roll");
+    leftHand_rollLay->addWidget(leftHand_rollLab);
+
+    leftHand_rollBox = new QDoubleSpinBox;
+    leftHand_rollBox->setSizePolicy(pbsize);
+    leftHand_rollBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    leftHand_rollBox->setToolTip(leftHand_rollLab->toolTip());
+    leftHand_rollBox->setDecimals(4);
+    leftHand_rollBox->setValue(0.038);
+    leftHand_rollBox->setSingleStep(0.01);
+    leftHand_rollBox->setMinimum(0);
+    leftHand_rollBox->setMaximum(10);
+    leftHand_rollLay->addWidget(leftHand_rollBox);
+    correction_SettingsLayout->addLayout(leftHand_rollLay);
+
+    QHBoxLayout* leftHand_pitchLay = new QHBoxLayout;
+    QLabel* leftHand_pitchLab = new QLabel;
+    leftHand_pitchLab->setText("left_hand pitch");
+    leftHand_pitchLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    leftHand_pitchLab->setToolTip("left_hand pitch");
+    leftHand_pitchLay->addWidget(leftHand_pitchLab);
+
+    leftHand_pitchBox = new QDoubleSpinBox;
+    leftHand_pitchBox->setSizePolicy(pbsize);
+    leftHand_pitchBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    leftHand_pitchBox->setToolTip(leftHand_pitchLab->toolTip());
+    leftHand_pitchBox->setDecimals(4);
+    leftHand_pitchBox->setValue(0.038);
+    leftHand_pitchBox->setSingleStep(0.01);
+    leftHand_pitchBox->setMinimum(0);
+    leftHand_pitchBox->setMaximum(10);
+    leftHand_pitchLay->addWidget(leftHand_pitchBox);
+    correction_SettingsLayout->addLayout(leftHand_pitchLay);
+
+    QHBoxLayout* leftHand_yawLay = new QHBoxLayout;
+    QLabel* leftHand_yawLab = new QLabel;
+    leftHand_yawLab->setText("left_hand yaw");
+    leftHand_yawLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    leftHand_yawLab->setToolTip("left_hand yaw");
+    leftHand_yawLay->addWidget(leftHand_yawLab);
+
+    leftHand_yawBox = new QDoubleSpinBox;
+    leftHand_yawBox->setSizePolicy(pbsize);
+    leftHand_yawBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    leftHand_yawBox->setToolTip(leftHand_yawLab->toolTip());
+    leftHand_yawBox->setDecimals(4);
+    leftHand_yawBox->setValue(0.038);
+    leftHand_yawBox->setSingleStep(0.01);
+    leftHand_yawBox->setMinimum(0);
+    leftHand_yawBox->setMaximum(10);
+    leftHand_yawLay->addWidget(leftHand_yawBox);
+    correction_SettingsLayout->addLayout(leftHand_yawLay);
+
+    // RIGHT HAND
+    QHBoxLayout* rightHand_xLay = new QHBoxLayout;
+    QLabel* rightHand_xLab = new QLabel;
+    rightHand_xLab->setText("right_hand x");
+    rightHand_xLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rightHand_xLab->setToolTip("right_hand x");
+    rightHand_xLay->addWidget(rightHand_xLab);
+
+    rightHand_xBox = new QDoubleSpinBox;
+    rightHand_xBox->setSizePolicy(pbsize);
+    rightHand_xBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rightHand_xBox->setToolTip(rightHand_xLab->toolTip());
+    rightHand_xBox->setDecimals(4);
+    rightHand_xBox->setValue(0.038);
+    rightHand_xBox->setSingleStep(0.01);
+    rightHand_xBox->setMinimum(0);
+    rightHand_xBox->setMaximum(10);
+    rightHand_xLay->addWidget(rightHand_xBox);
+    correction_SettingsLayout->addLayout(rightHand_xLay);
+    
+    QHBoxLayout* rightHand_yLay = new QHBoxLayout;
+    QLabel* rightHand_yLab = new QLabel;
+    rightHand_yLab->setText("right_hand y");
+    rightHand_yLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rightHand_yLab->setToolTip("right_hand y");
+    rightHand_yLay->addWidget(rightHand_yLab);
+
+    rightHand_yBox = new QDoubleSpinBox;
+    rightHand_yBox->setSizePolicy(pbsize);
+    rightHand_yBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rightHand_yBox->setToolTip(rightHand_yLab->toolTip());
+    rightHand_yBox->setDecimals(4);
+    rightHand_yBox->setValue(0.038);
+    rightHand_yBox->setSingleStep(0.01);
+    rightHand_yBox->setMinimum(0);
+    rightHand_yBox->setMaximum(10);
+    rightHand_yLay->addWidget(rightHand_yBox);
+    correction_SettingsLayout->addLayout(rightHand_yLay);
+
+    QHBoxLayout* rightHand_zLay = new QHBoxLayout;
+    QLabel* rightHand_zLab = new QLabel;
+    rightHand_zLab->setText("right_hand z");
+    rightHand_zLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rightHand_zLab->setToolTip("right_hand z");
+    rightHand_zLay->addWidget(rightHand_zLab);
+
+    rightHand_zBox = new QDoubleSpinBox;
+    rightHand_zBox->setSizePolicy(pbsize);
+    rightHand_zBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rightHand_zBox->setToolTip(rightHand_zLab->toolTip());
+    rightHand_zBox->setDecimals(4);
+    rightHand_zBox->setValue(0.038);
+    rightHand_zBox->setSingleStep(0.01);
+    rightHand_zBox->setMinimum(0);
+    rightHand_zBox->setMaximum(10);
+    rightHand_zLay->addWidget(rightHand_zBox);
+    correction_SettingsLayout->addLayout(rightHand_zLay);
+
+    QHBoxLayout* rightHand_rollLay = new QHBoxLayout;
+    QLabel* rightHand_rollLab = new QLabel;
+    rightHand_rollLab->setText("right_hand roll");
+    rightHand_rollLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rightHand_rollLab->setToolTip("right_hand roll");
+    rightHand_rollLay->addWidget(rightHand_rollLab);
+
+    rightHand_rollBox = new QDoubleSpinBox;
+    rightHand_rollBox->setSizePolicy(pbsize);
+    rightHand_rollBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rightHand_rollBox->setToolTip(rightHand_rollLab->toolTip());
+    rightHand_rollBox->setDecimals(4);
+    rightHand_rollBox->setValue(0.038);
+    rightHand_rollBox->setSingleStep(0.01);
+    rightHand_rollBox->setMinimum(0);
+    rightHand_rollBox->setMaximum(10);
+    rightHand_rollLay->addWidget(rightHand_rollBox);
+    correction_SettingsLayout->addLayout(rightHand_rollLay);
+
+    QHBoxLayout* rightHand_pitchLay = new QHBoxLayout;
+    QLabel* rightHand_pitchLab = new QLabel;
+    rightHand_pitchLab->setText("right_hand pitch");
+    rightHand_pitchLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rightHand_pitchLab->setToolTip("right_hand pitch");
+    rightHand_pitchLay->addWidget(rightHand_pitchLab);
+
+    rightHand_pitchBox = new QDoubleSpinBox;
+    rightHand_pitchBox->setSizePolicy(pbsize);
+    rightHand_pitchBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rightHand_pitchBox->setToolTip(rightHand_pitchLab->toolTip());
+    rightHand_pitchBox->setDecimals(4);
+    rightHand_pitchBox->setValue(0.038);
+    rightHand_pitchBox->setSingleStep(0.01);
+    rightHand_pitchBox->setMinimum(0);
+    rightHand_pitchBox->setMaximum(10);
+    rightHand_pitchLay->addWidget(rightHand_pitchBox);
+    correction_SettingsLayout->addLayout(rightHand_pitchLay);
+
+    QHBoxLayout* rightHand_yawLay = new QHBoxLayout;
+    QLabel* rightHand_yawLab = new QLabel;
+    rightHand_yawLab->setText("right_hand yaw");
+    rightHand_yawLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    rightHand_yawLab->setToolTip("right_hand yaw");
+    rightHand_yawLay->addWidget(rightHand_yawLab);
+
+    rightHand_yawBox = new QDoubleSpinBox;
+    rightHand_yawBox->setSizePolicy(pbsize);
+    rightHand_yawBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    rightHand_yawBox->setToolTip(rightHand_yawLab->toolTip());
+    rightHand_yawBox->setDecimals(4);
+    rightHand_yawBox->setValue(0.038);
+    rightHand_yawBox->setSingleStep(0.01);
+    rightHand_yawBox->setMinimum(0);
+    rightHand_yawBox->setMaximum(10);
+    rightHand_yawLay->addWidget(rightHand_yawBox);
+    correction_SettingsLayout->addLayout(rightHand_yawLay);
+
+   //LEGS
+    QHBoxLayout* legs_xLay = new QHBoxLayout;
+    QLabel* legs_xLab = new QLabel;
+    legs_xLab->setText("legs x");
+    legs_xLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    legs_xLab->setToolTip("legs x");
+    legs_xLay->addWidget(legs_xLab);
+
+    legs_xBox = new QDoubleSpinBox;
+    legs_xBox->setSizePolicy(pbsize);
+    legs_xBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    legs_xBox->setToolTip(legs_xLab->toolTip());
+    legs_xBox->setDecimals(4);
+    legs_xBox->setValue(0.038);
+    legs_xBox->setSingleStep(0.01);
+    legs_xBox->setMinimum(0);
+    legs_xBox->setMaximum(10);
+    legs_xLay->addWidget(legs_xBox);
+    correction_SettingsLayout->addLayout(legs_xLay);
+    
+    QHBoxLayout* legs_yLay = new QHBoxLayout;
+    QLabel* legs_yLab = new QLabel;
+    legs_yLab->setText("legs y");
+    legs_yLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    legs_yLab->setToolTip("legs y");
+    legs_yLay->addWidget(legs_yLab);
+
+    legs_yBox = new QDoubleSpinBox;
+    legs_yBox->setSizePolicy(pbsize);
+    legs_yBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    legs_yBox->setToolTip(legs_yLab->toolTip());
+    legs_yBox->setDecimals(4);
+    legs_yBox->setValue(0.038);
+    legs_yBox->setSingleStep(0.01);
+    legs_yBox->setMinimum(0);
+    legs_yBox->setMaximum(10);
+    legs_yLay->addWidget(legs_yBox);
+    correction_SettingsLayout->addLayout(legs_yLay);
+
+    QHBoxLayout* legs_zLay = new QHBoxLayout;
+    QLabel* legs_zLab = new QLabel;
+    legs_zLab->setText("legs z");
+    legs_zLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    legs_zLab->setToolTip("legs z");
+    legs_zLay->addWidget(legs_zLab);
+
+    legs_zBox = new QDoubleSpinBox;
+    legs_zBox->setSizePolicy(pbsize);
+    legs_zBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    legs_zBox->setToolTip(legs_zLab->toolTip());
+    legs_zBox->setDecimals(4);
+    legs_zBox->setValue(0.038);
+    legs_zBox->setSingleStep(0.01);
+    legs_zBox->setMinimum(0);
+    legs_zBox->setMaximum(10);
+    legs_zLay->addWidget(legs_zBox);
+    correction_SettingsLayout->addLayout(legs_zLay);
+
+    QHBoxLayout* legs_yawLay = new QHBoxLayout;
+    QLabel* legs_yawLab = new QLabel;
+    legs_yawLab->setText("legs yaw");
+    legs_yawLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    legs_yawLab->setToolTip("legs yaw");
+    legs_yawLay->addWidget(legs_yawLab);
+
+    legs_yawBox = new QDoubleSpinBox;
+    legs_yawBox->setSizePolicy(pbsize);
+    legs_yawBox->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+    legs_yawBox->setToolTip(legs_yawLab->toolTip());
+    legs_yawBox->setDecimals(4);
+    legs_yawBox->setValue(0.038);
+    legs_yawBox->setSingleStep(0.01);
+    legs_yawBox->setMinimum(0);
+    legs_yawBox->setMaximum(10);
+    legs_yawLay->addWidget(legs_yawBox);
+    correction_SettingsLayout->addLayout(legs_yawLay);
+
+   //Plan button
+    QVBoxLayout* correction_sendSettingsLayout = new QVBoxLayout;
+    correction_sendSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    correction_sendButton = new QPushButton;
+    correction_sendButton->setText("  Plan Correction ");
+    correction_sendButton->setSizePolicy(pbsize);
+    correction_sendSettingsLayout->addWidget(correction_sendButton, 1, Qt::AlignCenter);
+    connect(correction_sendButton, SIGNAL(clicked()), this, SLOT(handleCorrectionSend()));
+ 
+
+   //Run button
+    QVBoxLayout* correction_runSettingsLayout = new QVBoxLayout;
+    correction_runSettingsLayout->setAlignment(Qt::AlignCenter);
+
+    correction_runButton = new QPushButton;
+    correction_runButton->setText(" Run Correctin ");
+    correction_runButton->setSizePolicy(pbsize);
+    correction_runSettingsLayout->addWidget(correction_runButton, 1, Qt::AlignCenter);
+    connect(correction_runButton, SIGNAL(clicked()), this, SLOT(handleCorrectionRun()));
+ 
+
+    // master Layout
+    QVBoxLayout* masterLadderLayout = new QVBoxLayout;
+    masterLadderLayout->addLayout(correction_profileLayoutTop);
+    masterLadderLayout->addLayout(correction_SettingsLayout);
+    masterLadderLayout->addLayout(correction_sendSettingsLayout);
+    masterLadderLayout->addLayout(correction_runSettingsLayout);
+
+
+
+    correctionTab = new QWidget;
+    correctionTab->setLayout(masterLadderLayout);
     
     saveAsEdit->setText("Default");
     handleProfileSaveAs();

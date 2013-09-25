@@ -694,7 +694,7 @@ void HuboWalkWidget::achdConnectSlot()
                                  + "." + QString::number(ipAddrB)
                                  + "." + QString::number(ipAddrC)
                                  + "." + QString::number(ipAddrD)
-                    + " " + QString::fromLocal8Bit(LADDER_PLANNERINITCHAN));
+                    + " " + QString::fromLocal8Bit(CORRECTION_PLANNERINITCHAN));
     connect(&achdCorrectionPlanner, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
     connect(&achdCorrectionPlanner, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 
@@ -703,7 +703,7 @@ void HuboWalkWidget::achdConnectSlot()
                                  + "." + QString::number(ipAddrB)
                                  + "." + QString::number(ipAddrC)
                                  + "." + QString::number(ipAddrD)
-                    + " " + QString::fromLocal8Bit(HUBO_CHAN_LADDER_TRAJ_NAME));
+                    + " " + QString::fromLocal8Bit(HUBO_CHAN_CORRECTION_TRAJ_NAME));
     connect(&achdCorrectionCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
     connect(&achdCorrectionCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 

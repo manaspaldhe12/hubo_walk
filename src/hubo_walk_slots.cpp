@@ -636,9 +636,19 @@ void HuboWalkWidget::initializeAchConnections()
     achChannelBal.start("ach mk " + QString::fromLocal8Bit(HUBO_CHAN_CORRECTION_TRAJ_NAME)
                         + " -1 -m 3 -n 8000000 -o 666", QIODevice::ReadWrite);
     achChannelBal.waitForFinished();
-    r = ach_open(&correction_trajChan, HUBO_CHAN_LADDER_TRAJ_NAME, NULL );
+    r = ach_open(&correction_trajChan, HUBO_CHAN_CORRECTION_TRAJ_NAME, NULL );
     if( r != ACH_OK )
         std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
+
+    achChannelBal.start("ach mk " + QString::fromLocal8Bit(HUBO_CHAN_TRAJECTORY_PARAMS)
+                        + " -1 -m 10 -n 6000 -o 666", QIODevice::ReadWrite);
+    achChannelBal.waitForFinished();
+    r = ach_open(&traj_params, HUBO_CHAN_TRAJECTORY_PARAMS, NULL );
+    if( r != ACH_OK )
+        std::cout << "Ach Error: " << ach_result_to_string(r) << std::endl;
+
+
+
 
 }
 
@@ -707,6 +717,15 @@ void HuboWalkWidget::achdConnectSlot()
     connect(&achdCorrectionCmd, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
     connect(&achdCorrectionCmd, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
 
+    achdTrajectoryFollowerParams.start("achd push " + QString::number(ipAddrA)
+                                 + "." + QString::number(ipAddrB)
+                                 + "." + QString::number(ipAddrC)
+                                 + "." + QString::number(ipAddrD)
+                    + " " + QString::fromLocal8Bit(HUBO_CHAN_TRAJECTORY_PARAMS));
+    connect(&achdTrajectoryFollowerParams, SIGNAL(finished(int)), this, SLOT(achdExitFinished(int)));
+    connect(&achdTrajectoryFollowerParams, SIGNAL(error(QProcess::ProcessError)), this, SLOT(achdExitError(QProcess::ProcessError)));
+
+
 
 
 
@@ -733,4 +752,42 @@ void HuboWalkWidget::achdExitFinished(int num)
     statusLabel->setText("Disconnected");
 }
 
+
+void HuboWalkWidget::handleFileRun()
+{
+
+    //QString currentFile=fileSelect->currentText();
+    QString T=fileSelect->itemText(fileSelect->currentIndex());
+    //std::cout<<currentFile.toStdString();
+    //QString currentFile = "Test";    
+    std::cout << "Running the file: " << T.toStdString() << endl;
+    if (onButton->isChecked())
+    {
+        std::cout<<"Compliance mode: ON"<<endl;
+    }
+    else if (offButton->isChecked())
+    {
+        std::cout<<"Compliance Mode: OFF"<<endl;
+    }
+    /*if (mode)
+    {
+        std::cout << "Compliance mode: ON"<<endl;
+    }
+    else 
+    {
+        std::cout << "Compliance mode: OFF"<<endl;
+    }*/
+
 }
+
+void HuboWalkWidget::handleFilePause()
+{	
+    
+    std::cout << "Pause ON"<< endl;
+}
+}
+
+
+
+
+

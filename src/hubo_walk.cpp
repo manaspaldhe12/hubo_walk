@@ -408,12 +408,17 @@ HuboWalkWidget::HuboWalkWidget(QWidget *parent)
    
     initializeCorrectionTab();
     std::cerr << "Correction Tab loaded" << std::endl;
+
+    initializeTrajectoryFollowerTab();
+    std::cerr<<"Trajectory Follower Tab loaded"<<std::endl;
+    addTab(TrajectoryFollowerTab, "Trajectory Follower");
  
     addTab(commandTab, "Command");
     addTab(zmpParamTab, "ZMP Parameters");
     addTab(balParamTab, "Balance Parameters");
     addTab(ladderTab, "Ladder Tab");
     addTab(correctionTab, "Correction Tab");
+    addTab(TrajectoryFollowerTab, "Trajectory Follower");
     initializeAchConnections();
 
 //    refreshManager = new HuboRefreshManager;
@@ -2226,6 +2231,130 @@ void HuboWalkWidget::initializeCorrectionTab()
     profileSelect->setCurrentIndex(0);
 
 }
+
+////////////////////////////////////
+//Trajectory Follower Tab
+void HuboWalkWidget::initializeTrajectoryFollowerTab()
+{
+    QSizePolicy pbsize(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    //File select
+    QHBoxLayout* fileLayoutTop = new QHBoxLayout;
+    QLabel* fileLab = new QLabel;
+    fileLab->setText("File Name");
+    fileLayoutTop->addWidget(fileLab, 0, Qt::AlignVCenter | Qt::AlignRight);
+    
+    //To create a text box
+    fileSelect = new QComboBox;
+    fileLayoutTop->addWidget(fileSelect);
+    connect(fileSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(handlefileSelect(int))); 
+    
+    openFile = new QPushButton;
+    openFile->setSizePolicy(pbsize);
+    openFile->setText("Browse");
+    openFile->setToolTip("Open the selected file");
+    
+    fileLayoutTop->addWidget(openFile);
+    connect(openFile, SIGNAL(clicked()), this, SLOT(handleopenFile()));
+
+    //Creates a text box
+    QHBoxLayout* fileLayoutBottom = new QHBoxLayout;
+    fileName = new QLineEdit;
+    fileName->setToolTip("Enter the file name");
+    fileLayoutBottom->addWidget(fileName);
+
+    // Compliance ON or OFF
+    
+    QHBoxLayout* complianceSelectLayout = new QHBoxLayout;
+    compSelectGroup = new QButtonGroup;
+    compSelectGroup->setExclusive(true);
+    
+    onButton = new QRadioButton;
+    onButton->setText("ON");
+    onButton->setToolTip("Turn Compliance ON");
+    compSelectGroup->addButton(onButton);
+    complianceSelectLayout->addWidget(onButton);
+    //onButton->setChecked(true);
+    
+    offButton = new QRadioButton;
+    offButton->setText("OFF");
+    offButton->setToolTip("Turn Compliance OFF");
+    compSelectGroup->addButton(offButton);
+    complianceSelectLayout->addWidget(offButton);
+
+    changeButton = new QPushButton;
+    changeButton->setText("Change");
+    changeButton->setToolTip("Change compliance");
+    compSelectGroup->addButton(changeButton);
+    complianceSelectLayout->addWidget(changeButton);
+    
+    QGroupBox* complianceSelectBox = new QGroupBox;
+    complianceSelectBox->setTitle("Compliance Control");
+    complianceSelectBox->setStyleSheet(groupStyleSheet);
+    complianceSelectBox->setLayout(complianceSelectLayout);
+    complianceSelectBox->setAlignment(Qt::AlignAbsolute);
+    //pauseStatusLayout->addWidget(complianceSelectBox);
+
+    //Run button
+    QHBoxLayout* runLayout=new QHBoxLayout;
+    runButton=new QPushButton;
+    runButton->setSizePolicy(pbsize);
+    runButton->setText("Run");
+    runButton->setToolTip("Run the program");
+    runLayout->addWidget(runButton);
+    runLayout->setAlignment(Qt::AlignLeft);
+    connect(runButton, SIGNAL(clicked()), this, SLOT(handleFileRun()));
+    
+    //Pause Button
+    //QHBoxLayout* pauseLayout = new QHBoxLayout;
+    pauseButton = new QPushButton;
+    pauseButton->setSizePolicy(pbsize);
+    pauseButton->setText("Pause");
+    pauseButton->setToolTip("Pause the execution");
+    runLayout->addWidget(pauseButton);
+    connect(pauseButton, SIGNAL(clicked()), this, SLOT(handleFilePause()));
+    // Will always show paused (if pauseButton==1) then show paused?
+
+    QHBoxLayout* pauseStatusLayout = new QHBoxLayout;
+    QLabel* pauselab = new QLabel;
+    pauselab->setText("Status:");
+    pauseStatusLayout->addWidget(pauselab);
+    pauseStatus = new QLabel;
+    pauseStatus->setText("Paused");
+    pauseStatusLayout->addWidget(pauseStatus);
+    pauseStatusLayout->setAlignment(Qt::AlignHCenter);
+    //pauseLayout->addLayout(pauseStatusLayout);
+
+    // Display to show frequence=200Hz
+    QHBoxLayout* freqDisplayLayout = new QHBoxLayout;
+    QLabel* freqDisplaylab = new QLabel;
+    freqDisplaylab->setText("Frequency");
+    freqDisplayLayout->addWidget(freqDisplaylab);
+    QLabel* freqValue = new QLabel;
+    freqValue->setText("200 Hz");
+    freqDisplayLayout->addWidget(freqValue);
+    freqDisplayLayout->setAlignment(Qt::AlignAbsolute);
+    
+    pauseStatusLayout->addLayout(freqDisplayLayout);
+    pauseStatusLayout->addWidget(complianceSelectBox);
+    ////////////////////
+    
+    
+    //Master Layout
+    QVBoxLayout* masterTFTLayout = new QVBoxLayout;
+    masterTFTLayout->addLayout(fileLayoutTop);
+    masterTFTLayout->addLayout(fileLayoutBottom);
+    masterTFTLayout->addLayout(runLayout);
+    masterTFTLayout->addLayout(pauseStatusLayout);
+    masterTFTLayout->addLayout(freqDisplayLayout);
+    masterTFTLayout->addWidget(complianceSelectBox);
+    
+
+    TrajectoryFollowerTab=new QWidget;
+    TrajectoryFollowerTab->setLayout(masterTFTLayout);
+        
+} 
+///////////////////////////////////////////////////
+
 
 
 

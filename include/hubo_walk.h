@@ -152,13 +152,13 @@ public:
   bool zmpConnected;
   QProcess achdBal;
   bool balConnected;
-
   QProcess achdBalCmd;
   QProcess achdLadderCmd;
   QProcess achdLadderPlanner;   
 
   QProcess achdCorrectionPlanner;
   QProcess achdCorrectionCmd;
+  QProcess achdTrajectoryFollowerParams;
   // Update timer
   HuboRefreshManager* refreshManager;
   int getRefreshTime();
@@ -172,6 +172,7 @@ public:
   ach_channel_t ladder_trajChan;
   ach_channel_t correction_plannerInitChan;
   ach_channel_t correction_trajChan;
+  ach_channel_t traj_params;
 
   void initializeAchConnections();
 //  void initializeAchStructs();
@@ -237,8 +238,23 @@ public:
     QDoubleSpinBox* comXOffsetBox;
     QPushButton* staticButton;
     QPushButton* balOffButton;
-  ///////////////
-    
+
+     /////////////// Trajectory follow tab
+    QWidget* TrajectoryFollowerTab;
+
+      QComboBox* fileSelect;
+      QPushButton* openFile;
+      QLineEdit* fileName;
+
+      QPushButton* runButton;
+
+      QPushButton* pauseButton;
+      QLabel* pauseStatus;
+
+      QButtonGroup* compSelectGroup;
+      QRadioButton* onButton;
+      QRadioButton* offButton;
+      QPushButton* changeButton; 
 
     ///////////////
     QWidget* zmpParamTab;
@@ -428,6 +444,9 @@ protected Q_SLOTS:
   
   void ipEditHandle(const QString &text);
 
+ //for pause and run
+  void handleFileRun();
+  void handleFilePause() ;
 
   //Ladder
   void handleLadderSend();
@@ -445,6 +464,7 @@ private:
   void initializeBalParamTab();
   void initializeLadderTab();
   void initializeCorrectionTab();
+  void initializeTrajectoryFollowerTab();
 
 };
 

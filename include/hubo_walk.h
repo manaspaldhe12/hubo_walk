@@ -247,6 +247,8 @@ public:
       QLineEdit* fileName;
 
       QPushButton* runButton;
+      //Pramod changes
+      QPushButton* stopexeButton;
 
       QPushButton* pauseButton;
       QLabel* pauseStatus;

@@ -1832,6 +1832,7 @@ void HuboWalkWidget::initializeLadderTab()
 
 }
 
+
 void HuboWalkWidget::initializeCorrectionTab()
 {
     QSizePolicy pbsize(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1882,6 +1883,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     correction_SettingsLayout->setAlignment(Qt::AlignCenter);
 
     //LEFT HAND
+    
     QHBoxLayout* leftHand_xLay = new QHBoxLayout;
     QLabel* leftHand_xLab = new QLabel;
     leftHand_xLab->setText("left_hand x");
@@ -1899,7 +1901,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     leftHand_xBox->setMinimum(0);
     leftHand_xBox->setMaximum(10);
     leftHand_xLay->addWidget(leftHand_xBox);
-    correction_SettingsLayout->addLayout(leftHand_xLay);
+    //leftHand_correction->addLayout(leftHand_xLay);
     
     QHBoxLayout* leftHand_yLay = new QHBoxLayout;
     QLabel* leftHand_yLab = new QLabel;
@@ -1918,7 +1920,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     leftHand_yBox->setMinimum(0);
     leftHand_yBox->setMaximum(10);
     leftHand_yLay->addWidget(leftHand_yBox);
-    correction_SettingsLayout->addLayout(leftHand_yLay);
+    leftHand_xLay->addLayout(leftHand_yLay);
 
     QHBoxLayout* leftHand_zLay = new QHBoxLayout;
     QLabel* leftHand_zLab = new QLabel;
@@ -1937,7 +1939,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     leftHand_zBox->setMinimum(0);
     leftHand_zBox->setMaximum(10);
     leftHand_zLay->addWidget(leftHand_zBox);
-    correction_SettingsLayout->addLayout(leftHand_zLay);
+    leftHand_xLay->addLayout(leftHand_zLay);
 
     QHBoxLayout* leftHand_rollLay = new QHBoxLayout;
     QLabel* leftHand_rollLab = new QLabel;
@@ -1956,7 +1958,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     leftHand_rollBox->setMinimum(0);
     leftHand_rollBox->setMaximum(10);
     leftHand_rollLay->addWidget(leftHand_rollBox);
-    correction_SettingsLayout->addLayout(leftHand_rollLay);
+    leftHand_xLay->addLayout(leftHand_rollLay);
 
     QHBoxLayout* leftHand_pitchLay = new QHBoxLayout;
     QLabel* leftHand_pitchLab = new QLabel;
@@ -1975,7 +1977,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     leftHand_pitchBox->setMinimum(0);
     leftHand_pitchBox->setMaximum(10);
     leftHand_pitchLay->addWidget(leftHand_pitchBox);
-    correction_SettingsLayout->addLayout(leftHand_pitchLay);
+    leftHand_xLay->addLayout(leftHand_pitchLay);
 
     QHBoxLayout* leftHand_yawLay = new QHBoxLayout;
     QLabel* leftHand_yawLab = new QLabel;
@@ -1994,9 +1996,17 @@ void HuboWalkWidget::initializeCorrectionTab()
     leftHand_yawBox->setMinimum(0);
     leftHand_yawBox->setMaximum(10);
     leftHand_yawLay->addWidget(leftHand_yawBox);
-    correction_SettingsLayout->addLayout(leftHand_yawLay);
+    leftHand_xLay->addLayout(leftHand_yawLay);
+
+    //***********Pramod Changes************
+    QGroupBox* leftHandBox = new QGroupBox;
+    leftHandBox->setTitle("Left Hand Joints");
+    leftHandBox->setStyleSheet(groupStyleSheet);
+    leftHandBox->setLayout(leftHand_xLay);
+    
 
     // RIGHT HAND
+    
     QHBoxLayout* rightHand_xLay = new QHBoxLayout;
     QLabel* rightHand_xLab = new QLabel;
     rightHand_xLab->setText("right_hand x");
@@ -2014,7 +2024,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     rightHand_xBox->setMinimum(0);
     rightHand_xBox->setMaximum(10);
     rightHand_xLay->addWidget(rightHand_xBox);
-    correction_SettingsLayout->addLayout(rightHand_xLay);
+    //correction_rightHand->addLayout(rightHand_xLay);
     
     QHBoxLayout* rightHand_yLay = new QHBoxLayout;
     QLabel* rightHand_yLab = new QLabel;
@@ -2033,7 +2043,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     rightHand_yBox->setMinimum(0);
     rightHand_yBox->setMaximum(10);
     rightHand_yLay->addWidget(rightHand_yBox);
-    correction_SettingsLayout->addLayout(rightHand_yLay);
+    rightHand_xLay->addLayout(rightHand_yLay);
 
     QHBoxLayout* rightHand_zLay = new QHBoxLayout;
     QLabel* rightHand_zLab = new QLabel;
@@ -2052,7 +2062,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     rightHand_zBox->setMinimum(0);
     rightHand_zBox->setMaximum(10);
     rightHand_zLay->addWidget(rightHand_zBox);
-    correction_SettingsLayout->addLayout(rightHand_zLay);
+    rightHand_xLay->addLayout(rightHand_zLay);
 
     QHBoxLayout* rightHand_rollLay = new QHBoxLayout;
     QLabel* rightHand_rollLab = new QLabel;
@@ -2071,7 +2081,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     rightHand_rollBox->setMinimum(0);
     rightHand_rollBox->setMaximum(10);
     rightHand_rollLay->addWidget(rightHand_rollBox);
-    correction_SettingsLayout->addLayout(rightHand_rollLay);
+    rightHand_xLay->addLayout(rightHand_rollLay);
 
     QHBoxLayout* rightHand_pitchLay = new QHBoxLayout;
     QLabel* rightHand_pitchLab = new QLabel;
@@ -2090,7 +2100,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     rightHand_pitchBox->setMinimum(0);
     rightHand_pitchBox->setMaximum(10);
     rightHand_pitchLay->addWidget(rightHand_pitchBox);
-    correction_SettingsLayout->addLayout(rightHand_pitchLay);
+    rightHand_xLay->addLayout(rightHand_pitchLay);
 
     QHBoxLayout* rightHand_yawLay = new QHBoxLayout;
     QLabel* rightHand_yawLab = new QLabel;
@@ -2109,9 +2119,17 @@ void HuboWalkWidget::initializeCorrectionTab()
     rightHand_yawBox->setMinimum(0);
     rightHand_yawBox->setMaximum(10);
     rightHand_yawLay->addWidget(rightHand_yawBox);
-    correction_SettingsLayout->addLayout(rightHand_yawLay);
+    rightHand_xLay->addLayout(rightHand_yawLay);
+    
+    //***********Pramod Changes************
+    QGroupBox* rightHandBox = new QGroupBox;
+    rightHandBox->setTitle("Right Hand Joints");
+    rightHandBox->setStyleSheet(groupStyleSheet);
+    rightHandBox->setLayout(rightHand_xLay);
+    
 
    //LEGS
+
     QHBoxLayout* legs_xLay = new QHBoxLayout;
     QLabel* legs_xLab = new QLabel;
     legs_xLab->setText("legs x");
@@ -2129,7 +2147,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     legs_xBox->setMinimum(0);
     legs_xBox->setMaximum(10);
     legs_xLay->addWidget(legs_xBox);
-    correction_SettingsLayout->addLayout(legs_xLay);
+    //legs_correction->addLayout(legs_xLay);
     
     QHBoxLayout* legs_yLay = new QHBoxLayout;
     QLabel* legs_yLab = new QLabel;
@@ -2148,7 +2166,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     legs_yBox->setMinimum(0);
     legs_yBox->setMaximum(10);
     legs_yLay->addWidget(legs_yBox);
-    correction_SettingsLayout->addLayout(legs_yLay);
+    legs_xLay->addLayout(legs_yLay);
 
     QHBoxLayout* legs_zLay = new QHBoxLayout;
     QLabel* legs_zLab = new QLabel;
@@ -2167,7 +2185,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     legs_zBox->setMinimum(0);
     legs_zBox->setMaximum(10);
     legs_zLay->addWidget(legs_zBox);
-    correction_SettingsLayout->addLayout(legs_zLay);
+    legs_xLay->addLayout(legs_zLay);
 
     QHBoxLayout* legs_yawLay = new QHBoxLayout;
     QLabel* legs_yawLab = new QLabel;
@@ -2186,7 +2204,14 @@ void HuboWalkWidget::initializeCorrectionTab()
     legs_yawBox->setMinimum(0);
     legs_yawBox->setMaximum(10);
     legs_yawLay->addWidget(legs_yawBox);
-    correction_SettingsLayout->addLayout(legs_yawLay);
+    legs_xLay->addLayout(legs_yawLay);
+
+    //***********Pramod Changes************
+    QGroupBox* legsCorrection = new QGroupBox;
+    legsCorrection->setTitle("Leg Joints");
+    legsCorrection->setStyleSheet(groupStyleSheet);
+    legsCorrection->setLayout(legs_xLay);
+    
 
    //Plan button
     QVBoxLayout* correction_sendSettingsLayout = new QVBoxLayout;
@@ -2204,7 +2229,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     correction_runSettingsLayout->setAlignment(Qt::AlignCenter);
 
     correction_runButton = new QPushButton;
-    correction_runButton->setText(" Run Correctin ");
+    correction_runButton->setText(" Run Correction ");
     correction_runButton->setSizePolicy(pbsize);
     correction_runSettingsLayout->addWidget(correction_runButton, 1, Qt::AlignCenter);
     connect(correction_runButton, SIGNAL(clicked()), this, SLOT(handleCorrectionRun()));
@@ -2214,6 +2239,9 @@ void HuboWalkWidget::initializeCorrectionTab()
     QVBoxLayout* masterLadderLayout = new QVBoxLayout;
     masterLadderLayout->addLayout(correction_profileLayoutTop);
     masterLadderLayout->addLayout(correction_SettingsLayout);
+    masterLadderLayout->addWidget(leftHandBox);
+    masterLadderLayout->addWidget(rightHandBox);
+    masterLadderLayout->addWidget(legsCorrection);
     masterLadderLayout->addLayout(correction_sendSettingsLayout);
     masterLadderLayout->addLayout(correction_runSettingsLayout);
 
@@ -2231,6 +2259,7 @@ void HuboWalkWidget::initializeCorrectionTab()
     profileSelect->setCurrentIndex(0);
 
 }
+
 
 ////////////////////////////////////
 //Trajectory Follower Tab
@@ -2263,7 +2292,6 @@ void HuboWalkWidget::initializeTrajectoryFollowerTab()
     fileLayoutBottom->addWidget(fileName);
 
     // Compliance ON or OFF
-    
     QHBoxLayout* complianceSelectLayout = new QHBoxLayout;
     compSelectGroup = new QButtonGroup;
     compSelectGroup->setExclusive(true);
@@ -2304,6 +2332,18 @@ void HuboWalkWidget::initializeTrajectoryFollowerTab()
     runLayout->setAlignment(Qt::AlignLeft);
     connect(runButton, SIGNAL(clicked()), this, SLOT(handleFileRun()));
     
+    //************Pramod Changes**********
+    // Stop Button
+    //QHBoxLayout* stopLayout=new QHBoxLayout;
+    stopexeButton=new QPushButton;
+    stopexeButton->setSizePolicy(pbsize);
+    stopexeButton->setText("Stop");
+    stopexeButton->setToolTip("Stop the program");
+    runLayout->addWidget(stopexeButton);
+    //stopLayout->setAlignment(Qt::AlignLeft);
+    connect(stopexeButton, SIGNAL(clicked()), this, SLOT(handleFileStopexe()));
+
+
     //Pause Button
     //QHBoxLayout* pauseLayout = new QHBoxLayout;
     pauseButton = new QPushButton;
@@ -2323,7 +2363,6 @@ void HuboWalkWidget::initializeTrajectoryFollowerTab()
     pauseStatusLayout->addWidget(pauseStatus);
     pauseStatusLayout->setAlignment(Qt::AlignHCenter);
     //pauseLayout->addLayout(pauseStatusLayout);
-
     // Display to show frequence=200Hz
     QHBoxLayout* freqDisplayLayout = new QHBoxLayout;
     QLabel* freqDisplaylab = new QLabel;
@@ -2334,8 +2373,8 @@ void HuboWalkWidget::initializeTrajectoryFollowerTab()
     freqDisplayLayout->addWidget(freqValue);
     freqDisplayLayout->setAlignment(Qt::AlignAbsolute);
     
-    pauseStatusLayout->addLayout(freqDisplayLayout);
-    pauseStatusLayout->addWidget(complianceSelectBox);
+   // pauseStatusLayout->addLayout(freqDisplayLayout);
+   // pauseStatusLayout->addWidget(complianceSelectBox);
     ////////////////////
     
     
@@ -2351,7 +2390,6 @@ void HuboWalkWidget::initializeTrajectoryFollowerTab()
 
     TrajectoryFollowerTab=new QWidget;
     TrajectoryFollowerTab->setLayout(masterTFTLayout);
-        
 } 
 ///////////////////////////////////////////////////
 
